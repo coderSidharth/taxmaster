@@ -35,34 +35,23 @@ const TaxData = () => {
     }
 
     const ModalHandle = () => {
-        let finalTax = 0;
-        if (areaVal === "met") {
-            const n1 = parseInt(note.bas);
-            const n2 = parseInt(note.lta);
-            const n3 = parseInt(note.hra);
-            const n4 = parseInt(note.fa);
-            const n6 = parseInt(note.inv);
-            const n7 = parseInt(note.med);
-            const n8 = parseInt(note.rent);
-            const appHra = Math.max(0, Math.min(0.5 * n8 - 0.1 * n1, n3));
-            const ans = Math.round((n1 + n2 + n3 + n4) - appHra - n6 - n7);
-            setfinalTax(ans);
-            finalTax = ans;
-        }
-        else {
-            const n1 = parseInt(note.bas);
-            const n2 = parseInt(note.lta);
-            const n3 = parseInt(note.hra);
-            const n4 = parseInt(note.fa);
-            const n6 = parseInt(note.inv);
-            const n7 = parseInt(note.med);
-            const n8 = parseInt(note.rent);
-            const appHra = Math.max(0, Math.min(0.4 * n8 - 0.1 * n1, n3));
-            const ans = Math.round((n1 + n2 + n3 + n4) - appHra - n6 - n7);
-            finalTax = ans;
-            setfinalTax(ans);
-        }
-        addNote(note.bas, note.lta, note.hra, note.fa, note.inv, note.med, note.rent, finalTax);
+        // Any field left blank counts as 0, so the user only needs to enter the
+        // components that apply to them (Basic is still required).
+        const toNum = (v) => parseInt(v) || 0;
+        const n1 = toNum(note.bas);   // Basic
+        const n2 = toNum(note.lta);   // LTA
+        const n3 = toNum(note.hra);   // HRA
+        const n4 = toNum(note.fa);    // Food Allowance
+        const n6 = toNum(note.inv);   // Investments (80C)
+        const n7 = toNum(note.med);   // Medical Policy Premium (80D)
+        const n8 = toNum(note.rent);  // Rent
+
+        const hraRate = areaVal === "met" ? 0.5 : 0.4;  // metro vs non-metro
+        const appHra = Math.max(0, Math.min(hraRate * n8 - 0.1 * n1, n3));
+        const finalTax = Math.round((n1 + n2 + n3 + n4) - appHra - n6 - n7);
+        setfinalTax(finalTax);
+
+        addNote(n1, n2, n3, n4, n6, n7, n8, finalTax);
         closeRef.current.click();
         setNote({ bas: "", lta: "", hra: "", fa: "", inv: "", med: "", rent: "" });
         setHidden(true);
@@ -130,8 +119,9 @@ const TaxData = () => {
 
 
             {!hide ? <form className='my-2 taxCol'>
+                <p className='taxCol-hint'>Only <b>Basic</b> is required. Leave any field blank and it is treated as 0.</p>
                 <div className="form-group">
-                    <label htmlFor="bas" className='taxCol-head'>Basic</label>
+                    <label htmlFor="bas" className='taxCol-head'>Basic <span className='req'>*</span></label>
                     <input type="number" className="form-control adj-input shadow-none" id="bas" placeholder="Enter Basic" name="bas" autoComplete='false' onChange={onchange} value={note.bas} />
                 </div>
                 <div className="form-group">
@@ -165,7 +155,7 @@ const TaxData = () => {
                         <option value="nomet">Non-Metro</option>
                     </select><br />
                 </div>
-                <button type="submit" className="btn btn-primary my-2 glow-on-hover" onClick={handleClick} disabled={note.bas === "" || note.lta === "" || note.hra === "" || note.fa === "" || note.rent === "" || note.inv === "" || note.med === ""} >Submit</button>
+                <button type="submit" className="btn btn-primary my-2 glow-on-hover" onClick={handleClick} disabled={note.bas === ""} >Submit</button>
             </form> : null}
         </>
     )

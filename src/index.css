@@ -264,6 +264,20 @@ h1, h2, h3, h4, h5 {
   margin-bottom: 0.35rem;
 }
 
+.taxCol-hint {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 0 0 1rem;
+  padding: 0.5rem 0.7rem;
+  background: var(--accent-soft);
+  border-radius: var(--radius-sm);
+}
+
+.req {
+  color: var(--danger);
+  font-weight: 700;
+}
+
 .adj-input,
 .taxCol .form-control,
 .taxCol select {

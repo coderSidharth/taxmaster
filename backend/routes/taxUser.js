@@ -11,14 +11,10 @@ const { scheduleReminder } = require('../utils/mailer');
 
 
 
-//Route 1 : this end point POST "/api/notes/addnote" . Here we will add user tax details
+//Route 1 : this end point POST "/api/notes/addnote" . Here we will add user tax details.
+//Only Basic is required; every other component defaults to 0 when left blank.
 router.post("/addDetails", fetchuser, [
-    body('bas', "Enter a valid bas").isNumeric(),
-    body('lta', "Enter a valid lta").isNumeric(),
-    body('hra', "Enter a valid hra").isNumeric(),
-    body('fa', "Enter a valid fa").isNumeric(),
-    body('inv', "Enter a valid inv").isNumeric(),
-    body('med', "Enter a valid med").isNumeric()
+    body('bas', "Enter a valid basic amount").isNumeric()
 ], async (req, res) => {
     //if there are errors then return bad requests and the errors
     const errors = validationResult(req);
@@ -28,9 +24,18 @@ router.post("/addDetails", fetchuser, [
 
     try {
         const { bas, lta, hra, fa, inv, med, rent, finalTax } = req.body; //taking user filled data
+        const toNum = (v) => Number(v) || 0; //blank / missing / invalid -> 0
 
         const tax = new taxResult({
-            bas, lta, hra, fa, inv, med, user: req.user.id, rent, TotalTax: finalTax //adding user filled data in database. 4 filled will be added
+            bas: toNum(bas),
+            lta: toNum(lta),
+            hra: toNum(hra),
+            fa: toNum(fa),
+            inv: toNum(inv),
+            med: toNum(med),
+            rent: toNum(rent),
+            user: req.user.id,
+            TotalTax: finalTax
         })
         const savedNote = await tax.save();   //saving to database
         res.json(savedNote);
