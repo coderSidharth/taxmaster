@@ -44,7 +44,7 @@ const TaxData = () => {
             const n6 = parseInt(note.inv);
             const n7 = parseInt(note.med);
             const n8 = parseInt(note.rent);
-            const appHra = Math.min(0.5 * n8 - 0.1 * n1, n3);
+            const appHra = Math.max(0, Math.min(0.5 * n8 - 0.1 * n1, n3));
             const ans = Math.round((n1 + n2 + n3 + n4) - appHra - n6 - n7);
             setfinalTax(ans);
             finalTax = ans;
@@ -57,7 +57,7 @@ const TaxData = () => {
             const n6 = parseInt(note.inv);
             const n7 = parseInt(note.med);
             const n8 = parseInt(note.rent);
-            const appHra = Math.min(0.4 * n8 - 0.1 * n1, n3);
+            const appHra = Math.max(0, Math.min(0.4 * n8 - 0.1 * n1, n3));
             const ans = Math.round((n1 + n2 + n3 + n4) - appHra - n6 - n7);
             finalTax = ans;
             setfinalTax(ans);

@@ -9,6 +9,10 @@ const Signup = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (credentials.password !== credentials.cpassword) {
+            alert("Passwords do not match");
+            return;
+        }
         const response = await fetch('http://localhost:7000/api/auth/createUser', {
             method: 'POST',
             headers: {
@@ -17,9 +21,13 @@ const Signup = () => {
             body: JSON.stringify({ name: credentials.name, email: credentials.email, password: credentials.password }),
         });
         const json = await response.json();
-        console.log(json);
-        localStorage.setItem('token', json.authToken);
-        history.push("/"); //redirecting to "/" endpoint
+        if (json.success) {
+            localStorage.setItem('token', json.authToken);
+            history.push("/"); //redirecting to "/" endpoint
+        }
+        else {
+            alert((json.errors && json.errors[0] && json.errors[0].msg) || json.error || "Signup failed. Please try again.");
+        }
     }
 
     const onchange = (e) => {

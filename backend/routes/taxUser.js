@@ -6,9 +6,8 @@ const taxResult = require('../models/taxResult') //schema part
 const fetchuser = require("../middleware/fetchuser"); //from this middleware we will receieving user
 const remainderSchema = require("../models/remainder")
 const { body, validationResult } = require('express-validator');
-const schedule = require('node-schedule');
 require('dotenv').config();
-const nodemailer =require('nodemailer')
+const { scheduleReminder } = require('../utils/mailer');
 
 
 
@@ -92,43 +91,52 @@ router.put("/update_tax/:id", fetchuser, async (req, res) => {
 
 router.post("/setRemainder", fetchuser, async (req, res) => {
     try {
-        const { email, id, userId, date } = req.body; //taking user filled data
+        const { email, id, date } = req.body; //taking user filled data
+        if (!email || !id || !date) {
+            return res.status(400).json({ error: "email, id and date are required" });
+        }
+
+        const ifTax = await taxResult.findById(id); //make sure the record exists and belongs to the user
+        if (!ifTax) {
+            return res.status(404).send("Not Found");
+        }
+        if (ifTax.user.toString() !== req.user.id) {
+            return res.status(401).send("Not Allowed");
+        }
+
         const setData = new remainderSchema({
             email, taxId: id, userId: req.user.id, date
         })
 
-        await taxResult.findByIdAndUpdate(id, { $set: { remainderDate: date,userNameTax:email } }, { new: true });
+        await taxResult.findByIdAndUpdate(id, { $set: { remainderDate: date, userNameTax: email } }, { new: true });
         const savedRemainder = await setData.save();   //saving to database
-        res.json(savedRemainder);
 
-        // send reminder email 
-        let now = new Date();
-        // schedule.scheduleJob(new Date(date), async function () {
-        schedule.scheduleJob(new Date(now.getTime() +  10 * 1000), async function () {
-            // create reusable transporter object using the default SMTP transport
-            let transporter = nodemailer.createTransport({
-                host: "smtp.gmail.com",
-                port: 587,
-                secure: false,
-                auth: {
-                    user: process.env.EMAIL,
-                    pass: process.env.PASSWORD
-                }
-            });
-
-            // send mail with defined transport object
-            let info = await transporter.sendMail({
-                from: 'testmailraushan@gmail.com', // sender address
-                to: email, // list of receivers
-                subject: "Reminder: Tax Filing", // Subject line
-                text: "This is a reminder to file your taxes. Please do so as soon as possible." // plain text body
-            });
-
-            await taxResult.findByIdAndUpdate(id, { $set: { isRemainder: true } }, { new: true });
-
-            // console.log("Message sent: %s", info.messageId);
+        // Schedule the reminder email on the chosen date (handled in utils/mailer.js).
+        const scheduledFor = scheduleReminder({
+            remainderId: savedRemainder._id, taxId: id, email, date
         });
 
+        res.json({ ...savedRemainder.toObject(), scheduledFor });
+    }
+    catch (e) {
+        console.log(e);
+        res.status(500).send("Some error occured");
+    }
+})
+
+
+//delete a tax record of the logged in user
+router.delete("/delete_tax/:id", fetchuser, async (req, res) => {
+    try {
+        const ifTax = await taxResult.findById(req.params.id); //this will check whether the record exists
+        if (!ifTax) {
+            return res.status(404).send("Not Found");
+        }
+        if (ifTax.user.toString() !== req.user.id) {
+            return res.status(401).send("Not Allowed");
+        }
+        const deleted = await taxResult.findByIdAndDelete(req.params.id);
+        res.json({ success: true, deleted });
     }
     catch (e) {
         console.log(e);

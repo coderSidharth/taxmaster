@@ -107,6 +107,18 @@ h1, h2, h3, h4, h5 {
   color: #fff;
 }
 
+.btn-danger {
+  background-color: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+  color: #fff;
+}
+
 /* Neutralised "glow" and "adj-w" buttons — keep class names, drop the rainbow */
 .glow-on-hover {
   min-width: 180px;

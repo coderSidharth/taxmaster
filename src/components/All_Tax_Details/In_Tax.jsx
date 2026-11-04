@@ -3,7 +3,7 @@ import "./In_Tax.css"
 
 const In_Tax = (props) => {
 
-    const { tax, updateTax, setRemainder, remaiderStaus } = props;
+    const { tax, updateTax, setRemainder, deleteTax, remaiderStaus } = props;
 
     return (
         <>
@@ -51,12 +51,15 @@ const In_Tax = (props) => {
                             </div>
                         }
 
-                        <div class="btn-group " role="group" aria-label="Basic mixed styles example">
+                        <div className="btn-group" role="group" aria-label="Tax record actions">
                             {
-                                tax.status === false && <button type="button " onClick={() => updateTax(tax._id)} class="btn btn-warning">Mark Paid</button>
+                                tax.status === false && <button type="button" onClick={() => updateTax(tax._id)} className="btn btn-warning">Mark Paid</button>
                             }
                             {
-                                !tax.status && <button type="button" class="btn btn-success" onClick={() => setRemainder(tax)}> {remaiderStaus ? "Reschedule" : "Set Remainder"}</button>
+                                !tax.status && <button type="button" className="btn btn-success" onClick={() => setRemainder(tax._id)}> {remaiderStaus ? "Reschedule" : "Set Remainder"}</button>
+                            }
+                            {
+                                deleteTax && <button type="button" className="btn btn-danger" onClick={() => { if (window.confirm('Delete this tax record?')) deleteTax(tax._id); }}>Delete</button>
                             }
                         </div>
 

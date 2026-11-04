@@ -1,10 +1,19 @@
+require('dotenv').config();
 const connectToMongo = require('./db');
+const mongoose = require('mongoose');
 const express = require("express");
 var cors = require('cors');
+const { reschedulePendingReminders } = require('./utils/mailer');
 const app = express();
 
 const port = 7000;
 connectToMongo(); //just printing wether connected to database or not
+
+// Once the database is connected, re-create any reminder jobs that were saved
+// but not yet sent (node-schedule keeps jobs in memory and loses them on restart).
+mongoose.connection.once('open', () => {
+    reschedulePendingReminders();
+});
 
 app.use(cors());
 app.use(express.json()); //middleware. compulsory

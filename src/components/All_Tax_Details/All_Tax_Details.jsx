@@ -13,7 +13,7 @@ const All_Tax_Details = () => {
     const closeRef = useRef(null);
 
     const context = useContext(noteContext);
-    const { getTaxes, Taxes, updateTaxStaus, remainderAPI, remaiderStaus } = context;
+    const { getTaxes, Taxes, updateTaxStaus, remainderAPI, deleteTax, remaiderStaus } = context;
     const [storeTax, setTaxStore] = useState(Taxes);
 
     useEffect(() => { //for showing all the notes. which we fetched from mongoDb
@@ -135,7 +135,7 @@ const All_Tax_Details = () => {
                 }
 
                 {!remaiderStaus && Taxes.map((tax) => {
-                    return <In_Tax key={tax._id} tax={tax} updateTax={updateTax} setRemainder={setRemainder} remaiderStaus={remaiderStaus} />
+                    return <In_Tax key={tax._id} tax={tax} updateTax={updateTax} setRemainder={setRemainder} deleteTax={deleteTax} remaiderStaus={remaiderStaus} />
                 })}
             </div>
         </div>

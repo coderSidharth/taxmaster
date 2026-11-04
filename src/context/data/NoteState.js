@@ -81,7 +81,6 @@ const NoteState = (props) => {
 
 
     const remainderAPI = async (email, id, userId, date) => {
-        console.log(email);
         const response = await fetch(`${host}/api/taxUser/setRemainder/`, {
             method: "POST",
             headers: {
@@ -97,8 +96,21 @@ const NoteState = (props) => {
     }
 
 
+    //delete a tax record
+    const deleteTax = async (id) => {
+        await fetch(`${host}/api/taxUser/delete_tax/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "auth-token": localStorage.getItem('token')
+            },
+        });
+        setTaxes((prev) => prev.filter((tax) => tax._id !== id));
+    }
+
+
     return (
-        <NoteContext.Provider value={{ notes, addNote, getUser, user, getTaxes, Taxes, updateTaxStaus, remainderAPI, remaiderStaus }}>
+        <NoteContext.Provider value={{ notes, addNote, getUser, user, getTaxes, Taxes, updateTaxStaus, remainderAPI, deleteTax, remaiderStaus }}>
             {props.children}
         </NoteContext.Provider>
     )

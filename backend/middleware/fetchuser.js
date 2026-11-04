@@ -1,11 +1,12 @@
 var jwt = require("jsonwebtoken");
-const JWT_SECRET = "Raushanislege!@####nd"; //secret key for jwt token
+require('dotenv').config();
+const JWT_SECRET = process.env.JWT_SECRET || "Raushanislege!@####nd"; //secret key for jwt token (override via .env)
 
 const fetchuser = (req, res, next) => {
     //Get the user from the JWT token and add id to req object
     const token = req.header('auth-token');
     if (!token) {
-        res.status(401).send({ error: "Pleasee authenticate a valid user token" });
+        return res.status(401).send({ error: "Pleasee authenticate a valid user token" });
     }
 
     try {

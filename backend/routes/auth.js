@@ -5,7 +5,8 @@ const User = require('../models/users.js') //schema part
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 var jwt = require("jsonwebtoken")
-const JWT_SECRET = "Raushanislege!@####nd"; //secret key for jwt token
+require('dotenv').config();
+const JWT_SECRET = process.env.JWT_SECRET || "Raushanislege!@####nd"; //secret key for jwt token (override via .env)
 const fetchuser = require("../middleware/fetchuser"); //from this middleware we will receieving user
 
 
@@ -14,19 +15,12 @@ const fetchuser = require("../middleware/fetchuser"); //from this middleware we 
 router.post("/createUser", [
     body('email', "Enter a Valid email").isEmail(), //if error ocuurs then "Enter a Valid email" msg will pass
     body('name', "Enter a Valid name").isLength({ min: 3 }),
-    body('password', "Password must be atleast 5 Chars").isLength({ min: 4 }),
+    body('password', "Password must be atleast 5 Chars").isLength({ min: 5 }),
 ], async (req, res) => {
-    console.log(req.body)
     //if there are errors then return bad requests and the errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
-    }
-
-    const cpassword = req.body.cpassword;
-    const password = req.body.password;
-
-    if (password != cpassword) {
     }
 
     try {
@@ -55,11 +49,9 @@ router.post("/createUser", [
             }
         }
         const authToken = jwt.sign(data, JWT_SECRET); //here token generated
-        console.log(authToken);
 
-        success = true;
+        const success = true;
         res.json({ success, authToken }); //sending token to user
-        // catch (err=> { console.log(err) }) //this will print error on console
     }
     catch (e) {
         console.log(e);
