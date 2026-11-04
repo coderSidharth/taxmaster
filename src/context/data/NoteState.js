@@ -2,7 +2,7 @@ import NoteContext from "./NoteContext";
 import { useState } from "react";
 
 const NoteState = (props) => {
-    const host = "http://localhost:7000";
+    const host = "http://localhost:5001";
     const notesInitial = [];
     const [notes, setNotes] = useState(notesInitial);
     const [Taxes, setTaxes] = useState([]);
@@ -92,6 +92,8 @@ const NoteState = (props) => {
         const json = await response.json();
         if (json) {
             setRemainderStatus(true);
+            await getTaxes();
+            return json;
         }
     }
 
@@ -110,7 +112,7 @@ const NoteState = (props) => {
 
 
     return (
-        <NoteContext.Provider value={{ notes, addNote, getUser, user, getTaxes, Taxes, updateTaxStaus, remainderAPI, deleteTax, remaiderStaus }}>
+        <NoteContext.Provider value={{ notes, addNote, getUser, user, getTaxes, Taxes, updateTaxStaus, remainderAPI, deleteTax, remaiderStaus, setRemainderStatus }}>
             {props.children}
         </NoteContext.Provider>
     )

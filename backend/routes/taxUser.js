@@ -8,6 +8,7 @@ const remainderSchema = require("../models/remainder")
 const { body, validationResult } = require('express-validator');
 require('dotenv').config();
 const { scheduleReminder } = require('../utils/mailer');
+const { calculateTax } = require('../utils/taxCalculator');
 
 
 
@@ -26,6 +27,18 @@ router.post("/addDetails", fetchuser, [
         const { bas, lta, hra, fa, inv, med, rent, finalTax } = req.body; //taking user filled data
         const toNum = (v) => Number(v) || 0; //blank / missing / invalid -> 0
 
+        const computed = calculateTax({
+            bas: toNum(bas),
+            lta: toNum(lta),
+            hra: toNum(hra),
+            fa: toNum(fa),
+            inv: toNum(inv),
+            med: toNum(med),
+            rent: toNum(rent),
+        });
+
+        const taxToSave = finalTax != null ? String(finalTax) : String(computed.totalTaxPayable);
+
         const tax = new taxResult({
             bas: toNum(bas),
             lta: toNum(lta),
@@ -35,8 +48,8 @@ router.post("/addDetails", fetchuser, [
             med: toNum(med),
             rent: toNum(rent),
             user: req.user.id,
-            TotalTax: finalTax
-        })
+            TotalTax: taxToSave
+        });
         const savedNote = await tax.save();   //saving to database
         res.json(savedNote);
     }

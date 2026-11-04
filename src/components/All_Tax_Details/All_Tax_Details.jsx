@@ -1,11 +1,42 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import noteContext from '../../context/data/NoteContext';
-import Success from '../success_alert/Success';
 import In_Tax from './In_Tax';
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import "./All_Tax_Details.css"
 import Excel_down from './Excel_down';
+
+const formatForDateTimeInput = (d) => {
+    const pad = (n) => String(n).padStart(2, '0');
+    const year = d.getFullYear();
+    const month = pad(d.getMonth() + 1);
+    const day = pad(d.getDate());
+    const hours = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+const getDeliveryPreview = (dateStr) => {
+    if (!dateStr) return null;
+    const target = new Date(dateStr);
+    if (isNaN(target.getTime())) return null;
+    const diffMs = target.getTime() - Date.now();
+    if (diffMs <= 0) return 'Immediate (within ~15 seconds)';
+
+    const diffMins = Math.round(diffMs / (60 * 1000));
+    const diffHours = Math.round(diffMs / (60 * 60 * 1000));
+    const diffDays = Math.round(diffMs / (24 * 60 * 60 * 1000));
+
+    let relative = '';
+    if (diffMins < 60) {
+        relative = `in ${diffMins} minute${diffMins === 1 ? '' : 's'}`;
+    } else if (diffHours < 24) {
+        relative = `in ~${diffHours} hour${diffHours === 1 ? '' : 's'}`;
+    } else {
+        relative = `in ~${diffDays} day${diffDays === 1 ? '' : 's'}`;
+    }
+
+    return `${target.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })} (${relative})`;
+};
 
 const All_Tax_Details = () => {
     let history = useHistory();
@@ -13,10 +44,10 @@ const All_Tax_Details = () => {
     const closeRef = useRef(null);
 
     const context = useContext(noteContext);
-    const { getTaxes, Taxes, updateTaxStaus, remainderAPI, deleteTax, remaiderStaus } = context;
+    const { getTaxes, Taxes, updateTaxStaus, remainderAPI, deleteTax, remaiderStaus, setRemainderStatus } = context;
     const [storeTax, setTaxStore] = useState(Taxes);
 
-    useEffect(() => { //for showing all the notes. which we fetched from mongoDb
+    useEffect(() => {
         if (localStorage.getItem('token')) {
             getTaxes();
         }
@@ -26,40 +57,33 @@ const All_Tax_Details = () => {
         // eslint-disable-next-line
     }, []);
 
-
-    useEffect(() => { //for showing all the notes. which we fetched from mongoDb
-        setTaxStore(Taxes)
-        // eslint-disable-next-line
+    useEffect(() => {
+        setTaxStore(Taxes);
     }, [Taxes]);
 
-    useEffect(() => { //for showing all the notes. which we fetched from mongoDb
+    useEffect(() => {
         if (remaiderStaus) {
-            closeRef.current.click();
+            if (closeRef.current) {
+                closeRef.current.click();
+            }
+            const timer = setTimeout(() => {
+                if (setRemainderStatus) setRemainderStatus(false);
+            }, 6000);
+            return () => clearTimeout(timer);
         }
-        // eslint-disable-next-line
-    }, [remaiderStaus]);
+    }, [remaiderStaus, setRemainderStatus]);
 
     const updateTax = (id) => {
         updateTaxStaus(id);
     }
 
-
-    const [date, setDate] = useState('');
-
-    const handleInputChange = (e) => {
-        const inputDate = new Date(e.target.value);
-        const year = inputDate.getFullYear().toString();
-        const month = (inputDate.getMonth() + 1).toString().padStart(2, '0');
-        const day = inputDate.getDate().toString().padStart(2, '0');
-        const formattedDate = `${year}-${month}-${day}`;
-        setDate(formattedDate);
-    };
-
+    const [date, setDate] = useState(() => formatForDateTimeInput(new Date(Date.now() + 5 * 60 * 1000)));
     const [TaxId, setTaxId] = useState('');
+    const [selectedTax, setSelectedTax] = useState(null);
     const [detail, setDetail] = useState({ id: "", email: "", userId: localStorage.getItem('token') });
 
     const onchange = (e) => {
-        setDetail({ ...detail, [e.target.name]: e.target.value }) //iska matlab agar pahle jo value hai usko rahne do. aur jo bhi change ho rha uske name ko value ke barabar kar do
+        setDetail({ ...detail, [e.target.name]: e.target.value });
     }
 
     function isValidEmail(email) {
@@ -67,79 +91,195 @@ const All_Tax_Details = () => {
         return emailRegex.test(email);
     }
 
-    const setRemainder = (id) => {
+    const setRemainder = (tax) => {
+        const id = typeof tax === 'object' ? tax._id : tax;
+        const initialEmail = typeof tax === 'object' && tax.userNameTax ? tax.userNameTax : detail.email;
         setTaxId(id);
+        setSelectedTax(typeof tax === 'object' ? tax : null);
+        setDetail(prev => ({ ...prev, id, email: initialEmail }));
+
+        // Default to in 5 minutes for easy testing if not set
+        if (!date) {
+            setDate(formatForDateTimeInput(new Date(Date.now() + 5 * 60 * 1000)));
+        }
         ref.current.click();
     }
 
-    const handleClick = (e) => {
-        e.preventDefault(); //protecting page to not reload while clicking on submit button
-        if (!isValidEmail(detail.email)) {
-            alert('Enter Valid Email');
-        }
-        else {
-            remainderAPI(detail.email, TaxId, detail.userId, date);
-        }
-        // closeRef.current.click(); //for closing the tab after clicking on update button
+    const applyPreset = (minutes) => {
+        const target = new Date(Date.now() + minutes * 60 * 1000);
+        setDate(formatForDateTimeInput(target));
     }
 
+    const applyTomorrowPreset = () => {
+        const tom = new Date();
+        tom.setDate(tom.getDate() + 1);
+        tom.setHours(9, 0, 0, 0);
+        setDate(formatForDateTimeInput(tom));
+    }
+
+    const applyWeekPreset = () => {
+        const nextWeek = new Date();
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        nextWeek.setHours(9, 0, 0, 0);
+        setDate(formatForDateTimeInput(nextWeek));
+    }
+
+    const handleClick = async (e) => {
+        e.preventDefault();
+        if (!isValidEmail(detail.email)) {
+            alert('Please enter a valid recipient email address.');
+            return;
+        }
+        if (!date) {
+            alert('Please choose when to send the reminder.');
+            return;
+        }
+        await remainderAPI(detail.email, TaxId, detail.userId, date);
+    }
+
+    const minDateTime = formatForDateTimeInput(new Date());
+    const deliveryPreview = getDeliveryPreview(date);
 
     return (
         <div className='All_Tax_Details'>
-
             <Excel_down storeTax={storeTax} />
 
-            {/* Modal for taking email, due date and reamainder date as input */}
+            {/* Hidden Modal Trigger */}
             <button type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal" ref={ref}>
-                Launch demo modal
+                Launch reminder modal
             </button>
+
+            {/* Schedule Reminder Modal */}
             <div className="modal fade" id="exampleModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div className="modal-dialog" role="document">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="exampleModalLabel">Set Remainder</h5>
-                            <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                <div className="modal-dialog modal-dialog-centered" role="document">
+                    <div className="modal-content shadow border-0">
+                        <div className="modal-header bg-light">
+                            <h5 className="modal-title font-weight-bold" id="exampleModalLabel">
+                                ⏰ Schedule Tax Reminder
+                            </h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" ref={closeRef}></button>
                         </div>
-                        <div className="modal-body">
-                            <form className='my-3'>
-                                <div className="mb-3">
-                                    <label htmlFor="title" className="form-label">Customer Email</label>
-                                    <input type="email" className="form-control" id="email" aria-describedby="emailHelp" onChange={onchange} name='email' value={detail.email} />
+                        <div className="modal-body p-4">
+                            {selectedTax && (
+                                <div className="alert alert-light border mb-3 py-2 px-3 small">
+                                    <div><strong>Tax Record:</strong> <code className="text-primary">{selectedTax._id}</code></div>
+                                    {selectedTax.TotalTax && (
+                                        <div><strong>Total Tax Payable:</strong> ₹{Number(selectedTax.TotalTax).toLocaleString('en-IN')}</div>
+                                    )}
                                 </div>
+                            )}
+
+                            <form onSubmit={handleClick}>
                                 <div className="mb-3">
-                                    <div>
-                                        <label htmlFor="calendar-input">Enter Shedule date:</label>
-                                        <input id="calendar-input" type="date" value={date} onChange={handleInputChange} />
-                                        <p>Date: {date}</p>
+                                    <label htmlFor="email" className="form-label font-weight-bold">Recipient Email</label>
+                                    <input
+                                        type="email"
+                                        className="form-control"
+                                        id="email"
+                                        placeholder="e.g. name@gmail.com"
+                                        onChange={onchange}
+                                        name='email'
+                                        value={detail.email}
+                                        required
+                                    />
+                                    <small className="text-muted">The email where the tax reminder will be delivered.</small>
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className="form-label font-weight-bold d-block">Quick Timing Options</label>
+                                    <div className="btn-group btn-group-sm flex-wrap gap-1 mb-2" role="group">
+                                        <button type="button" className="btn btn-outline-secondary" onClick={() => applyPreset(5)}>⚡ In 5 min (test)</button>
+                                        <button type="button" className="btn btn-outline-secondary" onClick={() => applyPreset(15)}>In 15 min</button>
+                                        <button type="button" className="btn btn-outline-secondary" onClick={() => applyPreset(60)}>In 1 hour</button>
+                                        <button type="button" className="btn btn-outline-secondary" onClick={applyTomorrowPreset}>Tomorrow 9 AM</button>
+                                        <button type="button" className="btn btn-outline-secondary" onClick={applyWeekPreset}>In 1 week</button>
                                     </div>
                                 </div>
+
+                                <div className="mb-3">
+                                    <label htmlFor="calendar-input" className="form-label font-weight-bold">Or Pick Exact Date & Time:</label>
+                                    <input
+                                        id="calendar-input"
+                                        className="form-control"
+                                        type="datetime-local"
+                                        min={minDateTime}
+                                        value={date}
+                                        onChange={(e) => setDate(e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                {deliveryPreview && (
+                                    <div className="alert alert-info py-2 px-3 small mb-0 d-flex align-items-center">
+                                        <span className="me-2" style={{ fontSize: '18px' }}>📬</span>
+                                        <div>
+                                            <strong>Estimated Delivery:</strong><br />
+                                            <span>{deliveryPreview}</span>
+                                        </div>
+                                    </div>
+                                )}
                             </form>
                         </div>
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" ref={closeRef}>Close</button>
-                            <button type="button" disabled={!date || !detail.email} onClick={handleClick} className="btn btn-primary" >Schedule</button>
+                        <div className="modal-footer bg-light">
+                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button
+                                type="button"
+                                disabled={!date || !detail.email}
+                                onClick={handleClick}
+                                className="btn btn-primary font-weight-bold"
+                            >
+                                Schedule Reminder
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
 
+            {/* Customers Tax Cards - ALWAYS VISIBLE */}
             <div className="row my-3">
                 <h2 className='m-auto d-flex justify-content-center'>Customers Tax Info</h2>
-                <div className="container mx-2">
-                    {Taxes.length === 0 && 'No Tax to display'}
-                </div>
-                {
-                    remaiderStaus && <Success />
-                }
 
-                {!remaiderStaus && Taxes.map((tax) => {
-                    return <In_Tax key={tax._id} tax={tax} updateTax={updateTax} setRemainder={setRemainder} deleteTax={deleteTax} remaiderStaus={remaiderStaus} />
+                {remaiderStaus && (
+                    <div className="col-12 my-2">
+                        <div className="alert alert-success alert-dismissible fade show d-flex align-items-center justify-content-between shadow-sm" role="alert">
+                            <div>
+                                <strong>✓ Reminder Scheduled Successfully!</strong> Email will be dispatched according to the selected time.
+                            </div>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                aria-label="Close"
+                                onClick={() => setRemainderStatus && setRemainderStatus(false)}
+                            ></button>
+                        </div>
+                    </div>
+                )}
+
+                <div className="container mx-2">
+                    {Taxes.length === 0 && (
+                        <div className="text-center text-muted my-4">
+                            <h5>No Tax records found</h5>
+                            <p>Calculate taxes on the Home page to save records here.</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Taxes are ALWAYS mapped and visible */}
+                {Taxes.map((tax) => {
+                    return (
+                        <In_Tax
+                            key={tax._id}
+                            tax={tax}
+                            updateTax={updateTax}
+                            setRemainder={setRemainder}
+                            deleteTax={deleteTax}
+                            remaiderStaus={remaiderStaus}
+                        />
+                    );
                 })}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default All_Tax_Details
+export default All_Tax_Details;

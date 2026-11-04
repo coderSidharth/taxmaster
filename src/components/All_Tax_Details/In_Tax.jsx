@@ -22,32 +22,39 @@ const In_Tax = (props) => {
 
 
                         {
-                            tax.TotalTax && <h5 className="mt-4  card-text"><span className='taxTotal'>Total Tax Payable : </span> <span className='totalTax'>{tax.TotalTax} <span className='rs-tag'>Rs</span></span></h5>
+                            tax.TotalTax && <h5 className="mt-4  card-text"><span className='taxTotal'>Total Tax Payable : </span> <span className='totalTax'>₹{Number(tax.TotalTax).toLocaleString('en-IN')}</span></h5>
                         }
                         {
                             tax.userNameTax && <h5 className=" card-text"><span className='taxTotal'>User Email : </span> <span className='totalTax'>{tax.userNameTax}</span></h5>
                         }
 
                         {
-                            tax.remainderDate && <h5 className="mt-4 card-text"><span>Remainder Scheduled on </span> <span>{tax.remainderDate}</span></h5>
+                            tax.remainderDate && <h5 className="mt-4 card-text">
+                                <span className='tax-title'>Reminder Scheduled: </span>
+                                <span className='tax-value'>
+                                    {isNaN(new Date(tax.remainderDate).getTime())
+                                        ? tax.remainderDate
+                                        : new Date(tax.remainderDate).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                                </span>
+                            </h5>
                         }
 
 
                         {
                             tax.status === false ? <div className='adj-status mt-3'>
-                                <img class="adj-pending-img" src='https://cdn.pixabay.com/photo/2016/03/31/18/31/dialog-1294429_960_720.png' />
+                                <img className="adj-pending-img" alt="Unpaid status" src='https://cdn.pixabay.com/photo/2016/03/31/18/31/dialog-1294429_960_720.png' />
                                 <h5 className='mx-2 mt-1'>Unpaid</h5>
                             </div> :
                                 <div className='adj-status mt-3'>
-                                    <img class="adj-pending-img" src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuYITzz03wDFoEUTd25T9TiJxsYKsSXcHd5_0rTAxHRTewGw82PRE0Tcz3XpXdp_bh-fo&usqp=CAU' />
+                                    <img className="adj-pending-img" alt="Paid status" src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuYITzz03wDFoEUTd25T9TiJxsYKsSXcHd5_0rTAxHRTewGw82PRE0Tcz3XpXdp_bh-fo&usqp=CAU' />
                                     <h5 className='mx-2 mt-1'>Paid</h5>
                                 </div>
                         }
 
                         {
                             tax.isRemainder && <div className='adj-status mt-3'>
-                                <img class="adj-pending-img" src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuYITzz03wDFoEUTd25T9TiJxsYKsSXcHd5_0rTAxHRTewGw82PRE0Tcz3XpXdp_bh-fo&usqp=CAU' />
-                                <h5 className='mx-2 mt-1'>Remainder Sent</h5>
+                                <img className="adj-pending-img" alt="Reminder sent" src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuYITzz03wDFoEUTd25T9TiJxsYKsSXcHd5_0rTAxHRTewGw82PRE0Tcz3XpXdp_bh-fo&usqp=CAU' />
+                                <h5 className='mx-2 mt-1'>Reminder Sent</h5>
                             </div>
                         }
 
@@ -56,7 +63,9 @@ const In_Tax = (props) => {
                                 tax.status === false && <button type="button" onClick={() => updateTax(tax._id)} className="btn btn-warning">Mark Paid</button>
                             }
                             {
-                                !tax.status && <button type="button" className="btn btn-success" onClick={() => setRemainder(tax._id)}> {remaiderStaus ? "Reschedule" : "Set Remainder"}</button>
+                                !tax.status && <button type="button" className="btn btn-success" onClick={() => setRemainder(tax)}>
+                                    {tax.remainderDate ? "Reschedule Reminder" : "Set Reminder"}
+                                </button>
                             }
                             {
                                 deleteTax && <button type="button" className="btn btn-danger" onClick={() => { if (window.confirm('Delete this tax record?')) deleteTax(tax._id); }}>Delete</button>

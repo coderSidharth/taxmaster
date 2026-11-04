@@ -2,6 +2,7 @@ import React, { useContext, useState, useRef, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import noteContext from '../context/data/NoteContext';
 import ShowAns from './ShowAns';
+import { calculateTax } from '../utils/taxCalculator';
 
 const TaxData = () => {
     let history = useHistory();
@@ -24,34 +25,42 @@ const TaxData = () => {
 
     const [hide, setHidden] = useState(false);
 
-
     const [note, setNote] = useState({ bas: "", lta: "", hra: "", fa: "", inv: "", med: "", rent: "" });
     const [areaVal, setAreaVal] = useState("met");
     const [finalTax, setfinalTax] = useState(null);
-
+    const [taxSummary, setTaxSummary] = useState(null);
 
     const onchange = (e) => {
         setNote({ ...note, [e.target.name]: e.target.value })
     }
 
     const ModalHandle = () => {
-        // Any field left blank counts as 0, so the user only needs to enter the
-        // components that apply to them (Basic is still required).
+        const summary = calculateTax({
+            bas: note.bas,
+            lta: note.lta,
+            hra: note.hra,
+            fa: note.fa,
+            inv: note.inv,
+            med: note.med,
+            rent: note.rent,
+            areaVal
+        });
+
+        setfinalTax(summary.totalTaxPayable);
+        setTaxSummary(summary);
+
         const toNum = (v) => parseInt(v) || 0;
-        const n1 = toNum(note.bas);   // Basic
-        const n2 = toNum(note.lta);   // LTA
-        const n3 = toNum(note.hra);   // HRA
-        const n4 = toNum(note.fa);    // Food Allowance
-        const n6 = toNum(note.inv);   // Investments (80C)
-        const n7 = toNum(note.med);   // Medical Policy Premium (80D)
-        const n8 = toNum(note.rent);  // Rent
+        addNote(
+            toNum(note.bas),
+            toNum(note.lta),
+            toNum(note.hra),
+            toNum(note.fa),
+            toNum(note.inv),
+            toNum(note.med),
+            toNum(note.rent),
+            summary.totalTaxPayable
+        );
 
-        const hraRate = areaVal === "met" ? 0.5 : 0.4;  // metro vs non-metro
-        const appHra = Math.max(0, Math.min(hraRate * n8 - 0.1 * n1, n3));
-        const finalTax = Math.round((n1 + n2 + n3 + n4) - appHra - n6 - n7);
-        setfinalTax(finalTax);
-
-        addNote(n1, n2, n3, n4, n6, n7, n8, finalTax);
         closeRef.current.click();
         setNote({ bas: "", lta: "", hra: "", fa: "", inv: "", med: "", rent: "" });
         setHidden(true);
@@ -64,7 +73,7 @@ const TaxData = () => {
 
     return (
         <>
-            {!hide ? null : <ShowAns value={finalTax} />}
+            {!hide ? null : <ShowAns value={finalTax} summary={taxSummary} />}
             <button type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal" ref={ref}>
                 Launch demo modal
             </button>

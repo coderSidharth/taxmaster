@@ -13,7 +13,7 @@ const Signup = () => {
             alert("Passwords do not match");
             return;
         }
-        const response = await fetch('http://localhost:7000/api/auth/createUser', {
+        const response = await fetch('http://localhost:5001/api/auth/createUser', {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json"

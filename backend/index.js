@@ -1,3 +1,9 @@
+const buffer = require('buffer');
+if (!buffer.SlowBuffer) {
+    buffer.SlowBuffer = buffer.Buffer;
+}
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 require('dotenv').config();
 const connectToMongo = require('./db');
 const mongoose = require('mongoose');
@@ -6,20 +12,14 @@ var cors = require('cors');
 const { reschedulePendingReminders } = require('./utils/mailer');
 const app = express();
 
-const port = 7000;
-connectToMongo(); //just printing wether connected to database or not
-
-// Once the database is connected, re-create any reminder jobs that were saved
-// but not yet sent (node-schedule keeps jobs in memory and loses them on restart).
+const port = process.env.PORT || 5001;
+connectToMongo();
 mongoose.connection.once('open', () => {
     reschedulePendingReminders();
 });
 
 app.use(cors());
-app.use(express.json()); //middleware. compulsory
-
-//Available Routes //if we go on /api/auth this point then we will get the info which providing in ./routes/auth.js location
-// same for notes part
+app.use(express.json());
 app.use('/api/auth', require('./routes/auth.js'));
 app.use('/api/taxUser', require('./routes/taxUser.js'));
 
@@ -30,6 +30,6 @@ app.get("/", (req, res) => {
 
 
 app.listen(port, () => {
-    console.log("Listeninig to 7000 port......");
+    console.log(`Listeninig to ${port} port......`);
 })
 
