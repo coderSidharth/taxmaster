@@ -1,39 +1,98 @@
-.card-sh{
-    background-color: rgb(255, 255, 255);
+.card-sh {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 
-.totalTax{
-    color: brown;
+.card-sh:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
-.taxTotal{
-    font-weight: bold;
-    color: rgb(235, 32, 184);
+.card-sh .card-body {
+    width: 100%;
+    padding: 1.5rem;
 }
 
-.adj-pending-img{
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-}
-
-.adj-status{
+/* Each detail row rendered as a label / value pair */
+.card-sh .card-title,
+.card-sh .card-text {
+    font-size: 0.95rem;
+    font-weight: 400;
     display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.4rem 0;
+    margin: 0;
+    border-bottom: 1px solid #f1f2f4;
 }
 
-.adj-font-paid-btn{
+.tax-title {
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.tax-value {
+    color: var(--text);
+    font-weight: 600;
+    text-align: right;
+    word-break: break-all;
+}
+
+.ad-tax-id {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.rs-tag {
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 0.8rem;
+}
+
+.taxTotal {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.totalTax {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.adj-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none !important;
+}
+
+.adj-status h5 {
+    font-size: 0.95rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+.adj-pending-img {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.card-sh .btn-group {
+    margin-top: 1.25rem;
+    gap: 0.5rem;
+}
+
+.card-sh .btn-group .btn {
+    border-radius: var(--radius-sm) !important;
+}
+
+.adj-font-paid-btn {
     font-size: 10px;
-}
-
-.tax-title{
-    color: rgb(142, 40, 147);
-    font-weight: bold;
-}
-
-.tax-value{
-    color: rgb(255, 98, 80);
-}
-
-.rs-tag{
-    /* color: rgb(1, 22, 15);    */
 }

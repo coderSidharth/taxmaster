@@ -1,3 +1,26 @@
-.adj-block-table{
+.All_Tax_Details {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+}
+
+.All_Tax_Details h2 {
+    font-weight: 700;
+    font-size: 1.6rem;
+    margin: 1.5rem 0 0.5rem;
+}
+
+.All_Tax_Details .container {
+    text-align: center;
+    color: var(--muted);
+}
+
+/* Excel export button spacing */
+#test-table-xls-button {
+    margin: 0.5rem 0 1rem;
+}
+
+/* hidden source table for the Excel export */
+.adj-block-table {
     display: none !important;
 }

@@ -6,7 +6,7 @@ import Home from './components/Home';
 import About from './components/About';
 import Login from './components/Login';
 import Signup from './components/Signup';
-import All_Tax_Details from './components/All_Tax_Details/All_Tax_Details';
+import AllTaxDetails from './components/All_Tax_Details/All_Tax_Details';
 
 
 function App() {
@@ -30,7 +30,7 @@ function App() {
                 <Signup />
               </Route>
               <Route exact path="/Tax-Details">
-                <All_Tax_Details />
+                <AllTaxDetails />
               </Route>
             </Switch>
           </div>
