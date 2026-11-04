@@ -1,13 +1,12 @@
-const { Router } = require("express");
 const express = require("express");
 const router = express.Router();
-const User = require('../models/users.js') //schema part
+const User = require('../models/users.js');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
-var jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 require('dotenv').config();
-const JWT_SECRET = process.env.JWT_SECRET || "Raushanislege!@####nd"; //secret key for jwt token (override via .env)
-const fetchuser = require("../middleware/fetchuser"); //from this middleware we will receieving user
+const JWT_SECRET = process.env.JWT_SECRET || "Raushanislege!@####nd";
+const fetchuser = require("../middleware/fetchuser");
 
 
 //Route 1: create a user using POST "/api/auth/createUser". Doesn't require authentication. No login required
@@ -70,23 +69,17 @@ router.post("/login", [
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    var success = true;
-    //taking user entered details in relating to its variable
-    const email = req.body.email;
-    const paswword = req.body.password;
+    const { email, password } = req.body;
 
     try {
-        let user = await User.findOne({ email });  //matching wether user exists or not. 1st is database email and 2nd is user filled email
+        let user = await User.findOne({ email });
 
-        if (!user) //if user does not exist
-        {
-            success = false
-            return res.status(400).json({ error: "Incorrect credentials. please check once again" });
+        if (!user) {
+            return res.status(400).json({ success: false, error: "Incorrect credentials. please check once again" });
         }
-        const comparePassword = await bcrypt.compare(paswword, user.password); //user entered password and database hashed password. note :- 1st paswword is user entered and 2nd password is which we got "user" by "User.findOne({email : email})" and it returns true and false
+        const comparePassword = await bcrypt.compare(password, user.password);
         if (!comparePassword) {
-            success = false;
-            return res.status(400).json({ success, error: "Incorrect credentials. please check once again" });
+            return res.status(400).json({ success: false, error: "Incorrect credentials. please check once again" });
         }
 
         //if it reaches to this part that means the user entered credential is true. and now we will generate token for that login
@@ -95,13 +88,11 @@ router.post("/login", [
                 id: user.id
             }
         }
-        const authToken = jwt.sign(data, JWT_SECRET); //here token generated
-        success = true;
-        res.json({ success, authToken });
-        console.log("Logged in successfull...");
+        const authToken = jwt.sign(data, JWT_SECRET);
+        res.json({ success: true, authToken });
     }
     catch (e) {
-        console.log(e);
+        console.error(e);
         res.status(500).send("Internal Server Occured");
     }
 })

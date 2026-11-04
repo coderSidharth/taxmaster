@@ -1,9 +1,9 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import noteContext from '../../context/data/NoteContext';
-import In_Tax from './In_Tax';
+import InTax from './In_Tax';
 import "./All_Tax_Details.css"
-import Excel_down from './Excel_down';
+import ExcelDown from './Excel_down';
 
 const formatForDateTimeInput = (d) => {
     const pad = (n) => String(n).padStart(2, '0');
@@ -142,7 +142,7 @@ const All_Tax_Details = () => {
 
     return (
         <div className='All_Tax_Details'>
-            <Excel_down storeTax={storeTax} />
+            <ExcelDown storeTax={storeTax} />
 
             {/* Hidden Modal Trigger */}
             <button type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal" ref={ref}>
@@ -267,13 +267,12 @@ const All_Tax_Details = () => {
                 {/* Taxes are ALWAYS mapped and visible */}
                 {Taxes.map((tax) => {
                     return (
-                        <In_Tax
+                        <InTax
                             key={tax._id}
                             tax={tax}
                             updateTax={updateTax}
                             setRemainder={setRemainder}
                             deleteTax={deleteTax}
-                            remaiderStaus={remaiderStaus}
                         />
                     );
                 })}

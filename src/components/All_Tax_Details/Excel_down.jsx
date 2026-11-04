@@ -34,7 +34,7 @@ const Excel_down = ({storeTax}) => {
                     {
                         storeTax.map((ele) => {
                             return (
-                                <tr>
+                                <tr key={ele._id}>
                                     <td>{ele.userNameTax ? ele.userNameTax : "No Remainder Assigned"}</td>
                                     <td>{ele.remainderDate ? ele.remainderDate : "No Remainder Assigned"}</td>
                                     <td>{ele.TotalTax}</td>

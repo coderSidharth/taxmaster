@@ -82,9 +82,7 @@ const TaxData = () => {
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title" id="exampleModalLabel">Confirm Values</h5>
-                            <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
                             <form className='my-3'>
@@ -131,34 +129,34 @@ const TaxData = () => {
                 <p className='taxCol-hint'>Only <b>Basic</b> is required. Leave any field blank and it is treated as 0.</p>
                 <div className="form-group">
                     <label htmlFor="bas" className='taxCol-head'>Basic <span className='req'>*</span></label>
-                    <input type="number" className="form-control adj-input shadow-none" id="bas" placeholder="Enter Basic" name="bas" autoComplete='false' onChange={onchange} value={note.bas} />
+                    <input type="number" className="form-control adj-input shadow-none" id="bas" placeholder="Enter Basic" name="bas" autoComplete='off' onChange={onchange} value={note.bas} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="lta" className='taxCol-head'>LTA</label>
-                    <input type="number" className="form-control adj-input shadow-none" id="lta" placeholder="Enter lta" name="lta" autoComplete='false' onChange={onchange} value={note.lta} />
+                    <input type="number" className="form-control adj-input shadow-none" id="lta" placeholder="Enter lta" name="lta" autoComplete='off' onChange={onchange} value={note.lta} />
                 </div>
                 <div className="form-group" >
                     <label htmlFor="hra" className='taxCol-head'>HRA</label>
-                    <input type="number" className="form-control adj-input shadow-none" id="hra" placeholder="Enter hra" name="hra" autoComplete='false' onChange={onchange} value={note.hra} />
+                    <input type="number" className="form-control adj-input shadow-none" id="hra" placeholder="Enter hra" name="hra" autoComplete='off' onChange={onchange} value={note.hra} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="fa" className='taxCol-head'>Food Allowance</label>
-                    <input type="number" className="form-control adj-input shadow-none" id="fa" placeholder="Enter fa" name="fa" autoComplete='false' onChange={onchange} value={note.fa} />
+                    <input type="number" className="form-control adj-input shadow-none" id="fa" placeholder="Enter fa" name="fa" autoComplete='off' onChange={onchange} value={note.fa} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="inv" className='taxCol-head'>Investments</label>
-                    <input type="number" className="form-control adj-input shadow-none" id="inv" placeholder="Enter inv" name="inv" autoComplete='false' onChange={onchange} value={note.inv} />
+                    <input type="number" className="form-control adj-input shadow-none" id="inv" placeholder="Enter inv" name="inv" autoComplete='off' onChange={onchange} value={note.inv} />
                 </div>
                 <div className="form-group" >
                     <label htmlFor="med" className='taxCol-head'>Medical Policy Premium</label>
-                    <input type="number" className="form-control adj-input shadow-none" id="med" placeholder="Enter med" name="med" autoComplete='false' onChange={onchange} value={note.med} />
+                    <input type="number" className="form-control adj-input shadow-none" id="med" placeholder="Enter med" name="med" autoComplete='off' onChange={onchange} value={note.med} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="rent" className='taxCol-head'>Rent</label>
-                    <input type="number" className="form-control adj-input shadow-none" id="rent" placeholder="Enter rent" name="rent" autoComplete='false' onChange={onchange} value={note.rent} />
+                    <input type="number" className="form-control adj-input shadow-none" id="rent" placeholder="Enter rent" name="rent" autoComplete='off' onChange={onchange} value={note.rent} />
                 </div>
                 <div className="form-group my-2">
-                    <label htmlFor="med" className='taxCol-head'>Area</label>
+                    <label htmlFor="tempDiff" className='taxCol-head'>Area</label>
                     <select name="tempDiff" id="tempDiff" className='mx-2' value={areaVal} onChange={(e) => { setAreaVal(e.target.value) }}>
                         <option value="met">Metro</option>
                         <option value="nomet">Non-Metro</option>

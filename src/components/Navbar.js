@@ -1,19 +1,14 @@
-import React, { useEffect } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-
+import React from 'react';
+import { useLocation, useHistory, Link } from 'react-router-dom';
 
 const Navbar = () => {
-
     let history = useHistory();
+    let location = useLocation();
+
     const handleLogout = () => {
         localStorage.removeItem('token');
         history.push('/login');
-    }
-    let location = useLocation();
-    useEffect(() => {
-        console.log(location.pathname);
-    }, [location]); //location is used to highlight the active navbar link
+    };
 
     return <div>
         <nav className="navbar nav-adj navbar-expand-lg navbar-light">

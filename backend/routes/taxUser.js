@@ -1,12 +1,9 @@
-const { Router } = require("express");
 const express = require("express");
-const app = express();
 const router = express.Router();
-const taxResult = require('../models/taxResult') //schema part
-const fetchuser = require("../middleware/fetchuser"); //from this middleware we will receieving user
-const remainderSchema = require("../models/remainder")
+const taxResult = require('../models/taxResult');
+const fetchuser = require("../middleware/fetchuser");
+const remainderSchema = require("../models/remainder");
 const { body, validationResult } = require('express-validator');
-require('dotenv').config();
 const { scheduleReminder } = require('../utils/mailer');
 const { calculateTax } = require('../utils/taxCalculator');
 
@@ -60,50 +57,34 @@ router.post("/addDetails", fetchuser, [
 })
 
 
-//getting all the tax details for the particular use
+// Getting all tax details for the logged-in user
 router.get("/get_all_tax", fetchuser, async (req, res) => {
-    // //if there are errors then return bad requests and the errors
-    // const errors = validationResult(req);
-    // if (!errors.isEmpty()) {
-    //     return res.status(400).json({ errors: errors.array() });
-    // }
-
     try {
-        const { userId } = req.body; //taking user filled data
         const taxes = await taxResult.find({ user: req.user.id });
         res.json(taxes);
-    }
-    catch (e) {
-        console.log(e);
+    } catch (e) {
+        console.error(e);
         res.status(500).send("Some error occured");
     }
-})
+});
 
+// Mark tax as paid
 router.put("/update_tax/:id", fetchuser, async (req, res) => {
-    // //if there are errors then return bad requests and the errors
-    // const errors = validationResult(req);
-    // if (!errors.isEmpty()) {
-    //     return res.status(400).json({ errors: errors.array() });
-    // }
-
     try {
-        const { userId } = req.body; //taking user filled data
-        const userExist = await taxResult.find({ user: req.user.id });
-        const ifTax = await taxResult.findById(req.params.id); //this will check user url id exists or not
+        const ifTax = await taxResult.findById(req.params.id);
         if (!ifTax) {
             return res.status(404).send("Not Found");
         }
-        if (ifTax.user.toString() != req.user.id) {
+        if (ifTax.user.toString() !== req.user.id) {
             return res.status(401).send("Not Allowed");
         }
         const taxUpdated = await taxResult.findByIdAndUpdate(req.params.id, { $set: { status: true } }, { new: true });
         res.json(taxUpdated);
-    }
-    catch (e) {
-        console.log(e);
+    } catch (e) {
+        console.error(e);
         res.status(500).send("Some error occured");
     }
-})
+});
 
 
 

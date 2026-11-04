@@ -4,11 +4,10 @@ if (!buffer.SlowBuffer) {
 }
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
-require('dotenv').config();
 const connectToMongo = require('./db');
 const mongoose = require('mongoose');
 const express = require("express");
-var cors = require('cors');
+const cors = require('cors');
 const { reschedulePendingReminders } = require('./utils/mailer');
 const app = express();
 

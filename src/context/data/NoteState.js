@@ -3,28 +3,21 @@ import { useState } from "react";
 
 const NoteState = (props) => {
     const host = "http://localhost:5001";
-    const notesInitial = [];
-    const [notes, setNotes] = useState(notesInitial);
     const [Taxes, setTaxes] = useState([]);
-
-    const userInit = [];
-
-    const [user, setUser] = useState(userInit);
+    const [user, setUser] = useState({});
     const [remaiderStaus, setRemainderStatus] = useState(false);
 
-    //Add a note
-    const addNote = async (bas, lta, hra, fa, inv, med, rent,finalTax) => {
-        //API CALL
+    // Add a tax record
+    const addNote = async (bas, lta, hra, fa, inv, med, rent, finalTax) => {
         const response = await fetch(`${host}/api/taxUser/addDetails`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "auth-token": localStorage.getItem('token')
             },
-            body: JSON.stringify({ bas, lta, hra, fa, inv, med, rent,finalTax }),
+            body: JSON.stringify({ bas, lta, hra, fa, inv, med, rent, finalTax }),
         });
-        const note = await response.json();
-        setNotes(notes.concat(note));
+        return await response.json();
     };
 
 
@@ -59,24 +52,14 @@ const NoteState = (props) => {
     }
 
     const updateTaxStaus = async (id) => {
-        const response = await fetch(`${host}/api/taxUser/update_tax/${id}`, {
+        await fetch(`${host}/api/taxUser/update_tax/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 "auth-token": localStorage.getItem('token')
             },
-            // body: JSON.stringify({ bas, lta, hra, fa, inv, med, rent, status, date }),
         });
-        const json = await response.json();
-        let newTaxes = JSON.parse(JSON.stringify(Taxes));
-        for (let index = 0; index < newTaxes.length; index++) {
-            const element = newTaxes[index];
-            if (element._id === id) {
-                newTaxes[index].status = true;
-                break;
-            }
-        }
-        setTaxes(newTaxes)
+        setTaxes((prev) => prev.map((t) => (t._id === id ? { ...t, status: true } : t)));
     }
 
 
@@ -112,7 +95,7 @@ const NoteState = (props) => {
 
 
     return (
-        <NoteContext.Provider value={{ notes, addNote, getUser, user, getTaxes, Taxes, updateTaxStaus, remainderAPI, deleteTax, remaiderStaus, setRemainderStatus }}>
+        <NoteContext.Provider value={{ addNote, getUser, user, getTaxes, Taxes, updateTaxStaus, remainderAPI, deleteTax, remaiderStaus, setRemainderStatus }}>
             {props.children}
         </NoteContext.Provider>
     )

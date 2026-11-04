@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import "./In_Tax.css"
+import React from 'react';
+import "./In_Tax.css";
 
 const In_Tax = (props) => {
-
-    const { tax, updateTax, setRemainder, deleteTax, remaiderStaus } = props;
+    const { tax, updateTax, setRemainder, deleteTax } = props;
 
     return (
         <>
@@ -71,11 +70,6 @@ const In_Tax = (props) => {
                                 deleteTax && <button type="button" className="btn btn-danger" onClick={() => { if (window.confirm('Delete this tax record?')) deleteTax(tax._id); }}>Delete</button>
                             }
                         </div>
-
-                        {/* <p className="card-text">{note.description}</p> */}
-                        {/* <i className="fas fa-trash-alt mx-2" onClick={() => { deleteNote(note._id) }}></i> */}
-                        {/* //sending id in deleteNote function of noteState.js */}
-                        {/* <i className="fas fa-edit mx-2" onClick={() => updateNote(note)}>edit</i> */}
                     </div>
                 </div>
             </div>
@@ -83,4 +77,4 @@ const In_Tax = (props) => {
     )
 }
 
-export default In_Tax
+export default In_Tax;

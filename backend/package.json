@@ -4,7 +4,8 @@
   "description": "created by raushan kumar",
   "main": "index.js",
   "scripts": {
-    "serve": "nodemon server.js "
+    "start": "node index.js",
+    "serve": "nodemon index.js"
   },
   "author": "Raushan Kumar",
   "license": "ISC",
