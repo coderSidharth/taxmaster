@@ -39,10 +39,12 @@ const Excel_down = ({storeTax}) => {
                                     <td>{ele.remainderDate ? ele.remainderDate : "No Remainder Assigned"}</td>
                                     <td>{ele.TotalTax}</td>
                                     <td>{ele.user}</td>
+                                    <td>{ele.status ? "Paid" : "Unpaid"}</td>
                                     <td>{ele.bas}</td>
                                     <td>{ele.lta}</td>
                                     <td>{ele.hra}</td>
                                     <td>{ele.fa}</td>
+                                    <td>{ele.inv}</td>
                                     <td>{ele.med}</td>
                                     <td>{ele.rent}</td>
                                 </tr>

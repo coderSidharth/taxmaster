@@ -1,38 +1,47 @@
 .main-success {
     text-align: center;
-    padding: 3rem 0;
-    /* background: #EBF0F5; */
-    /* height: 80vh;
-    width: 80vw; */
-}
-
-.h1-success {
-    color: #88B04B;
-    font-family: "Nunito Sans", "Helvetica Neue", sans-serif;
-    font-weight: 900;
-    font-size: 25px;
-    margin-bottom: 10px;
-}
-
-.p-success {
-    color: #404F5E;
-    font-family: "Nunito Sans", "Helvetica Neue", sans-serif;
-    font-size: 20px;
-    margin: 0;
-}
-
-.checkmark {
-    color: #9ABC66;
-    font-size: 100px;
-    line-height: 200px;
-    margin-left: -15px;
+    padding: 3rem 1rem;
 }
 
 .card-sucess {
-    background: white;
-    padding: 60px;
-    border-radius: 4px;
-    box-shadow: 0 2px 3px #C8D0D8;
+    background: var(--surface);
+    padding: 3rem 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
     display: inline-block;
-    margin: 0 auto;
+    margin: 2rem auto 0;
+    max-width: 420px;
+}
+
+.success-circle {
+    border-radius: 50%;
+    height: 96px;
+    width: 96px;
+    background: #ecfdf3;
+    margin: 0 auto 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkmark {
+    color: var(--success);
+    font-size: 52px;
+    line-height: 1;
+    font-style: normal;
+}
+
+.h1-success {
+    color: var(--text);
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+}
+
+.p-success {
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
 }

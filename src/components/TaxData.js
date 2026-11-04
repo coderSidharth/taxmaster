@@ -91,32 +91,32 @@ const TaxData = () => {
                         <div className="modal-body">
                             <form className='my-3'>
                                 <div className="mb-3">
-                                    <label htmlFor="title" className="form-label">Basic</label>
-                                    <input type="text" className="form-control" id="etitle" aria-describedby="emailHelp" name='etitle' value={note.bas} onChange={onchange} />
+                                    <label htmlFor="ebas" className="form-label">Basic</label>
+                                    <input type="number" className="form-control" id="ebas" name='bas' value={note.bas} onChange={onchange} />
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="description" className="form-label">LTA</label>
-                                    <input type="text" className="form-control" id="edescription" name='edescription' value={note.lta} onChange={onchange} />
+                                    <label htmlFor="elta" className="form-label">LTA</label>
+                                    <input type="number" className="form-control" id="elta" name='lta' value={note.lta} onChange={onchange} />
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="etag" className="form-label">HRA</label>
-                                    <input type="text" className="form-control" id="etag" name='etag' value={note.hra} onChange={onchange} />
+                                    <label htmlFor="ehra" className="form-label">HRA</label>
+                                    <input type="number" className="form-control" id="ehra" name='hra' value={note.hra} onChange={onchange} />
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="etag" className="form-label">Food Allowance</label>
-                                    <input type="text" className="form-control" id="etag" name='etag' value={note.fa} onChange={onchange} />
+                                    <label htmlFor="efa" className="form-label">Food Allowance</label>
+                                    <input type="number" className="form-control" id="efa" name='fa' value={note.fa} onChange={onchange} />
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="etag" className="form-label">Investments</label>
-                                    <input type="text" className="form-control" id="etag" name='etag' value={note.inv} onChange={onchange} />
+                                    <label htmlFor="einv" className="form-label">Investments</label>
+                                    <input type="number" className="form-control" id="einv" name='inv' value={note.inv} onChange={onchange} />
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="etag" className="form-label">Medical Policy Premium</label>
-                                    <input type="text" className="form-control" id="etag" name='etag' value={note.med} onChange={onchange} />
+                                    <label htmlFor="emed" className="form-label">Medical Policy Premium</label>
+                                    <input type="number" className="form-control" id="emed" name='med' value={note.med} onChange={onchange} />
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="etag" className="form-label">Rent</label>
-                                    <input type="text" className="form-control" id="etag" name='etag' value={note.rent} onChange={onchange} />
+                                    <label htmlFor="erent" className="form-label">Rent</label>
+                                    <input type="number" className="form-control" id="erent" name='rent' value={note.rent} onChange={onchange} />
                                 </div>
                             </form>
                         </div>
