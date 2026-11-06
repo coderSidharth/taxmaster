@@ -21,7 +21,7 @@ const NoteState = (props) => {
     };
 
 
-    //get user details for about page
+    // Fetch authenticated user profile
     const getUser = async () => {
         const response = await fetch(`${host}/api/auth/getuser`, {
             method: "POST",
@@ -31,12 +31,10 @@ const NoteState = (props) => {
             },
         });
         const json = await response.json();
-        console.log(json);
         setUser(json);
-        console.log(user);
     }
 
-    //get all taxes of user
+    // Fetch all tax calculations for the user
     const getTaxes = async () => {
         const response = await fetch(`${host}/api/taxUser/get_all_tax`, {
             method: "GET",
@@ -46,9 +44,7 @@ const NoteState = (props) => {
             },
         });
         const json = await response.json();
-        console.log(json);
         setTaxes(json);
-        console.log(Taxes);
     }
 
     const updateTaxStaus = async (id) => {

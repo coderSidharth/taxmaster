@@ -1,20 +1,17 @@
-import React from 'react';
-import {useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { useContext } from 'react';
 import noteContext from '../context/data/NoteContext';
-
 
 const About = () => {
   const context = useContext(noteContext);
   const { getUser, user } = context;
-  let history = useHistory();
+  const history = useHistory();
 
-  useEffect(() => { //for showing all the notes. which we fetched from mongoDb
+  useEffect(() => {
+    // Load profile if signed in; otherwise redirect to login
     if (localStorage.getItem('token')) {
       getUser();
-    }
-    else {
+    } else {
       history.push("/login");
     }
     // eslint-disable-next-line

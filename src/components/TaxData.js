@@ -7,11 +7,9 @@ import { calculateTax } from '../utils/taxCalculator';
 const TaxData = () => {
     let history = useHistory();
 
-    useEffect(() => { //for showing all the notes. which we fetched from mongoDb
-        if (localStorage.getItem('token')) {
-            history.push("/");
-        }
-        else {
+    useEffect(() => {
+        // Redirect to login if user is not signed in
+        if (!localStorage.getItem('token')) {
             history.push("/login");
         }
         // eslint-disable-next-line

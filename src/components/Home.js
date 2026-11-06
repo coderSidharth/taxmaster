@@ -1,12 +1,8 @@
-import React from 'react'
-import TaxData from './TaxData'
+import React from 'react';
+import TaxData from './TaxData';
 
 const Home = () => {
-    return (
-        <>
-            <TaxData />
-        </>
-    )
-}
+    return <TaxData />;
+};
 
-export default Home
+export default Home;

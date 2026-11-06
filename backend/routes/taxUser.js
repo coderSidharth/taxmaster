@@ -9,20 +9,19 @@ const { calculateTax } = require('../utils/taxCalculator');
 
 
 
-//Route 1 : this end point POST "/api/notes/addnote" . Here we will add user tax details.
-//Only Basic is required; every other component defaults to 0 when left blank.
+// Route 1: Save tax calculation details — POST /api/taxUser/addDetails (requires auth)
+// Only Basic is strictly required; remaining components default to 0 when left blank.
 router.post("/addDetails", fetchuser, [
     body('bas', "Enter a valid basic amount").isNumeric()
 ], async (req, res) => {
-    //if there are errors then return bad requests and the errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
     try {
-        const { bas, lta, hra, fa, inv, med, rent, finalTax } = req.body; //taking user filled data
-        const toNum = (v) => Number(v) || 0; //blank / missing / invalid -> 0
+        const { bas, lta, hra, fa, inv, med, rent, finalTax } = req.body;
+        const toNum = (v) => Number(v) || 0;
 
         const computed = calculateTax({
             bas: toNum(bas),
@@ -47,28 +46,26 @@ router.post("/addDetails", fetchuser, [
             user: req.user.id,
             TotalTax: taxToSave
         });
-        const savedNote = await tax.save();   //saving to database
+        const savedNote = await tax.save();
         res.json(savedNote);
+    } catch (e) {
+        console.error(e);
+        res.status(500).send("Some error occurred");
     }
-    catch (e) {
-        console.log(e);
-        res.status(500).send("Some error occured");
-    }
-})
+});
 
-
-// Getting all tax details for the logged-in user
+// Route 2: Get all saved tax calculations for the logged-in user — GET /api/taxUser/get_all_tax
 router.get("/get_all_tax", fetchuser, async (req, res) => {
     try {
         const taxes = await taxResult.find({ user: req.user.id });
         res.json(taxes);
     } catch (e) {
         console.error(e);
-        res.status(500).send("Some error occured");
+        res.status(500).send("Some error occurred");
     }
 });
 
-// Mark tax as paid
+// Route 3: Mark tax as paid — PUT /api/taxUser/update_tax/:id
 router.put("/update_tax/:id", fetchuser, async (req, res) => {
     try {
         const ifTax = await taxResult.findById(req.params.id);
@@ -82,20 +79,19 @@ router.put("/update_tax/:id", fetchuser, async (req, res) => {
         res.json(taxUpdated);
     } catch (e) {
         console.error(e);
-        res.status(500).send("Some error occured");
+        res.status(500).send("Some error occurred");
     }
 });
 
-
-
+// Route 4: Schedule an email reminder — POST /api/taxUser/setRemainder
 router.post("/setRemainder", fetchuser, async (req, res) => {
     try {
-        const { email, id, date } = req.body; //taking user filled data
+        const { email, id, date } = req.body;
         if (!email || !id || !date) {
             return res.status(400).json({ error: "email, id and date are required" });
         }
 
-        const ifTax = await taxResult.findById(id); //make sure the record exists and belongs to the user
+        const ifTax = await taxResult.findById(id);
         if (!ifTax) {
             return res.status(404).send("Not Found");
         }
@@ -105,29 +101,26 @@ router.post("/setRemainder", fetchuser, async (req, res) => {
 
         const setData = new remainderSchema({
             email, taxId: id, userId: req.user.id, date
-        })
+        });
 
         await taxResult.findByIdAndUpdate(id, { $set: { remainderDate: date, userNameTax: email } }, { new: true });
-        const savedRemainder = await setData.save();   //saving to database
+        const savedRemainder = await setData.save();
 
-        // Schedule the reminder email on the chosen date (handled in utils/mailer.js).
         const scheduledFor = scheduleReminder({
             remainderId: savedRemainder._id, taxId: id, email, date
         });
 
         res.json({ ...savedRemainder.toObject(), scheduledFor });
+    } catch (e) {
+        console.error(e);
+        res.status(500).send("Some error occurred");
     }
-    catch (e) {
-        console.log(e);
-        res.status(500).send("Some error occured");
-    }
-})
+});
 
-
-//delete a tax record of the logged in user
+// Route 5: Delete a tax record — DELETE /api/taxUser/delete_tax/:id
 router.delete("/delete_tax/:id", fetchuser, async (req, res) => {
     try {
-        const ifTax = await taxResult.findById(req.params.id); //this will check whether the record exists
+        const ifTax = await taxResult.findById(req.params.id);
         if (!ifTax) {
             return res.status(404).send("Not Found");
         }
@@ -136,12 +129,11 @@ router.delete("/delete_tax/:id", fetchuser, async (req, res) => {
         }
         const deleted = await taxResult.findByIdAndDelete(req.params.id);
         res.json({ success: true, deleted });
+    } catch (e) {
+        console.error(e);
+        res.status(500).send("Some error occurred");
     }
-    catch (e) {
-        console.log(e);
-        res.status(500).send("Some error occured");
-    }
-})
+});
 
 
 module.exports = router

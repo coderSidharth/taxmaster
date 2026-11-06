@@ -45,21 +45,16 @@ const All_Tax_Details = () => {
 
     const context = useContext(noteContext);
     const { getTaxes, Taxes, updateTaxStaus, remainderAPI, deleteTax, remaiderStaus, setRemainderStatus } = context;
-    const [storeTax, setTaxStore] = useState(Taxes);
 
     useEffect(() => {
+        // Load tax calculations for authenticated user; otherwise redirect to login
         if (localStorage.getItem('token')) {
             getTaxes();
-        }
-        else {
+        } else {
             history.push("/login");
         }
         // eslint-disable-next-line
     }, []);
-
-    useEffect(() => {
-        setTaxStore(Taxes);
-    }, [Taxes]);
 
     useEffect(() => {
         if (remaiderStaus) {
@@ -142,7 +137,7 @@ const All_Tax_Details = () => {
 
     return (
         <div className='All_Tax_Details'>
-            <ExcelDown storeTax={storeTax} />
+            <ExcelDown storeTax={Taxes} />
 
             {/* Hidden Modal Trigger */}
             <button type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal" ref={ref}>

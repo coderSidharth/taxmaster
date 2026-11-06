@@ -1,22 +1,21 @@
-var jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 require('dotenv').config();
-const JWT_SECRET = process.env.JWT_SECRET || "Raushanislege!@####nd"; //secret key for jwt token (override via .env)
+const JWT_SECRET = process.env.JWT_SECRET || "Raushanislege!@####nd";
 
 const fetchuser = (req, res, next) => {
-    //Get the user from the JWT token and add id to req object
+    // Read JWT auth-token from request header
     const token = req.header('auth-token');
     if (!token) {
-        return res.status(401).send({ error: "Pleasee authenticate a valid user token" });
+        return res.status(401).send({ error: "Please authenticate using a valid token" });
     }
 
     try {
         const data = jwt.verify(token, JWT_SECRET);
-        req.user = data.user; //here we got a object. and inside object we got the id of user
-        next(); // this nex() is compulsory
+        req.user = data.user;
+        next();
+    } catch (e) {
+        res.status(401).send({ error: "Invalid or expired token" });
     }
-    catch (e) {
-        res.status(401).send({ error: "Server Error" });
-    }
-}
+};
 
 module.exports = fetchuser;
